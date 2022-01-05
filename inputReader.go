@@ -26,42 +26,47 @@ func readFile(filePath string, verbose bool) (string, molecule) {
 	// create line counter
 	i := 1
 
-	var molecules molecule
+	var ligand molecule
+	ligandAtoms := make(map[int]atom)
+	ligand.atoms = ligandAtoms
+	ligand.charge = ligandCharge
+	ligand.multiplicity = ligandMultiplicity
 
 	for scanner.Scan() {
 		// get next line
 		line := scanner.Text()
 		// split by whitespace
 		tokens := strings.Fields(line)
-		if len(tokens) > 5 {
+		if len(tokens) > 4 {
 
 			// create new atom
 			var newAtom atom
 
-			newAtom.element = tokens[0]
+			newAtom.number, _ = strconv.Atoi(tokens[0])
+			newAtom.element = tokens[1]
 			pos := make([]float64,3)
-			for j := 1; j < 4; j++ {
-				pos[j-1], err = strconv.ParseFloat(tokens[j],64)
+			for j := 2; j < 5; j++ {
+				pos[j-2], err = strconv.ParseFloat(tokens[j],64)
 				if err != nil {
 					newErr := errors.New("Failed to convert \"" + tokens[j] + "\" in position 0 on line " + strconv.Itoa(i) + " to a float64")
 					log.Fatal(newErr)
 				}
 			}
 			newAtom.pos = pos
+			newAtom.bondedAtoms = []int{}
 
-			// add atom to map
-			if verbose{
-				fmt.Println("Found new atom " + newAtom.element + " at line " + strconv.Itoa(i) + " - adding to pos " + strconv.Itoa(atomCounter))
+			for j := 6; j < len(tokens); j++ {
+				newBond, _ := strconv.Atoi(tokens[j])
+				newAtom.bondedAtoms = append(newAtom.bondedAtoms, newBond)
 			}
 
-			molecules[molCounter].atoms[atomCounter] = newAtom
-			atomCounter++
+			ligand.atoms[newAtom.number] = newAtom
 
 		}
 		i++
 	}
 
-	return structureName, molecules
+	return structureName, ligand
 }
 
 func printMolecule(molecule molecule) {

@@ -9,6 +9,7 @@ type molecule struct {
 }
 
 type atom struct {
+	number int
 	element string
 	pos []float64
 	bondedAtoms []int

@@ -5,17 +5,10 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strconv"
 )
 
-func writeInputs(ion molecule, ligands []molecule, outDir string, structName string) {
-	for i, ligand := range ligands {
-		writeInput(ion, ligand, outDir, structName, i)
-	}
-}
-
-func writeInput(ion molecule, ligand molecule, outDir string, structName string, i int) {
-	outPath := filepath.Join(outDir, structName + "_" + strconv.Itoa(i) + ".inp")
+func writeInput(ion molecule, ligand molecule, outDir string, structName string) {
+	outPath := filepath.Join(outDir, structName + ".inp")
 	_ = os.MkdirAll(outDir, 0755)
 	thisFile, err := os.Create(outPath)
 	if err != nil {
